@@ -1,0 +1,113 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\ClubManagementApiCRUD\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\clubmanagementapicrud\\clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\clubmanagementapicrud\\clubmanagementapi\\validator\\clubdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\validator\\clubdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\clubmanagementapicrud\\clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ClubMembersController.cs",
+              "DocumentMoniker": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubMembersController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubMembersController.cs",
+              "ToolTip": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubMembersController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubMembersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-06T17:33:01.27Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ClubDtoValidator.cs",
+              "DocumentMoniker": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\ClubDtoValidator.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\ClubDtoValidator.cs",
+              "ToolTip": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\ClubDtoValidator.cs",
+              "RelativeToolTip": "ClubManagementApi\\Validator\\ClubDtoValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-06T17:31:51.126Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ClubsController.cs",
+              "DocumentMoniker": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubsController.cs",
+              "ToolTip": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGEBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-06T17:31:17.999Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\AuthController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\AuthController.cs",
+              "ToolTip": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\AuthController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\AuthController.cs",
+              "ViewState": "AgIAAJEBAAAAAAAAAAAAwKsBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-06T17:28:41.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\UsersController.cs",
+              "ToolTip": "D:\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T07:53:55.769Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
