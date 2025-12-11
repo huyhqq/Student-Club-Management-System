@@ -41,7 +41,9 @@ namespace ClubManagementApi.Controllers
             int MemberCount,
             string PresidentName,
             DateTime CreatedAt,
-            decimal? JoinFee
+            decimal? JoinFee,
+            bool IsJoined,
+            bool HasPendingRequest
         );
         public record ClubDetailDto(
             int ClubId,
@@ -52,7 +54,9 @@ namespace ClubManagementApi.Controllers
             string PresidentName,
             int MemberCount,
             DateTime CreatedAt,
-            decimal? JoinFee
+            decimal? JoinFee,
+            bool IsJoined,
+            bool HasPendingRequest
         );
         public record CreateClubDto(string ClubName, string? Description, decimal? JoinFee);
         public record UpdateClubDto(string ClubName, string? Description, decimal? JoinFee);
@@ -64,29 +68,56 @@ namespace ClubManagementApi.Controllers
             var validation = await _paginationValidator.ValidateAsync(p);
             if (!validation.IsValid)
                 return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+
             var query = _context.Clubs
                 .Include(c => c.President)
                 .Include(c => c.ClubMembers)
                 .Include(c => c.FeeSchedules)
                 .Where(c => c.Status == "Active");
+
             if (!string.IsNullOrEmpty(p.Search))
                 query = query.Where(c => c.ClubName.Contains(p.Search.Trim()));
+
             var total = await query.CountAsync();
-            var clubs = await query
+
+            var clubsQuery = query
                 .OrderByDynamic(p.SortBy ?? "CreatedAt", p.SortOrder ?? "desc")
                 .Skip((p.PageNumber - 1) * p.PageSize)
-                .Take(p.PageSize)
-                .Select(c => new ClubPublicDto(
-                    c.ClubId,
-                    c.ClubName,
-                    c.Description,
-                    c.ClubMembers.Count(m => m.Status == "Approved"),
-                    c.President!.FullName,
-                    c.CreatedAt.Value.ConvertToVietnamTime(),
-                    c.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee).Amount
-                ))
-                .ToListAsync();
-            return Ok(ApiResponse<List<ClubPublicDto>>.SuccessResponse(clubs, "Danh sách CLB công khai", total));
+                .Take(p.PageSize);
+
+            var clubs = await clubsQuery.ToListAsync();
+
+            var joinedClubIds = new HashSet<int>();
+            var pendingClubIds = new HashSet<int>();
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var joinedList = await _context.ClubMembers
+                    .Where(m => m.UserId == CurrentUserId && m.Status == "Approved")
+                    .Select(m => m.ClubId)
+                    .ToListAsync();
+                joinedClubIds = new HashSet<int>(joinedList);
+
+                var pendingList = await _context.ClubJoinRequests
+                    .Where(r => r.UserId == CurrentUserId && r.Status == "Pending")
+                    .Select(r => r.ClubId)
+                    .ToListAsync();
+                pendingClubIds = new HashSet<int>(pendingList);
+            }
+
+            var result = clubs.Select(c => new ClubPublicDto(
+                c.ClubId,
+                c.ClubName,
+                c.Description,
+                c.ClubMembers.Count(m => m.Status == "Approved"),
+                c.President!.FullName,
+                c.CreatedAt.Value.ConvertToVietnamTime(),
+                c.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount,
+                joinedClubIds.Contains(c.ClubId),
+                pendingClubIds.Contains(c.ClubId)
+            )).ToList();
+
+            return Ok(ApiResponse<List<ClubPublicDto>>.SuccessResponse(result, "Danh sách CLB công khai", total));
         }
 
         [AllowAnonymous]
@@ -98,8 +129,22 @@ namespace ClubManagementApi.Controllers
                 .Include(c => c.ClubMembers)
                 .Include(c => c.FeeSchedules)
                 .FirstOrDefaultAsync(c => c.ClubId == id && c.Status == "Active");
+
             if (club == null)
                 return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại hoặc chưa được duyệt"));
+
+            bool isJoined = false;
+            bool hasPendingRequest = false;
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                isJoined = await _context.ClubMembers
+                    .AnyAsync(m => m.ClubId == id && m.UserId == CurrentUserId && m.Status == "Approved");
+
+                hasPendingRequest = await _context.ClubJoinRequests
+                    .AnyAsync(r => r.ClubId == id && r.UserId == CurrentUserId && r.Status == "Pending");
+            }
+
             var dto = new ClubPublicDto(
                 club.ClubId,
                 club.ClubName,
@@ -107,10 +152,14 @@ namespace ClubManagementApi.Controllers
                 club.ClubMembers.Count(m => m.Status == "Approved"),
                 club.President!.FullName,
                 club.CreatedAt.Value.ConvertToVietnamTime(),
-                club.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount
+                club.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount,
+                isJoined,
+                hasPendingRequest
             );
+
             return Ok(ApiResponse<ClubPublicDto>.SuccessResponse(dto));
         }
+
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationParams p, [FromQuery] string? status = null)
@@ -118,41 +167,70 @@ namespace ClubManagementApi.Controllers
             var validation = await _paginationValidator.ValidateAsync(p);
             if (!validation.IsValid)
                 return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+
             var query = _context.Clubs
                 .Include(c => c.President)
                 .Include(c => c.ClubMembers)
                 .Include(c => c.FeeSchedules)
                 .AsQueryable();
+
             if (!User.IsInRole("Admin"))
             {
                 query = query.Where(c =>
-                    c.Status == "Active" ||
-                    (c.Status == "Pending" && c.PresidentId == CurrentUserId)
+                    c.PresidentId == CurrentUserId &&
+                    (c.Status == "Active" || c.Status == "Pending")
                 );
             }
+
             if (!string.IsNullOrEmpty(status))
                 query = query.Where(c => c.Status == status);
+
             if (!string.IsNullOrEmpty(p.Search))
                 query = query.Where(c => c.ClubName.Contains(p.Search.Trim()));
+
             var total = await query.CountAsync();
+
             var clubs = await query
                 .OrderByDynamic(p.SortBy ?? "CreatedAt", p.SortOrder ?? "desc")
                 .Skip((p.PageNumber - 1) * p.PageSize)
                 .Take(p.PageSize)
-                .Select(c => new ClubDetailDto(
-                    c.ClubId,
-                    c.ClubName,
-                    c.Description,
-                    c.Status,
-                    c.PresidentId.Value,
-                    c.President!.FullName,
-                    c.ClubMembers.Count(m => m.Status == "Approved"),
-                    c.CreatedAt.Value.ConvertToVietnamTime(),
-                    c.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee).Amount
-                ))
                 .ToListAsync();
-            return Ok(ApiResponse<List<ClubDetailDto>>.SuccessResponse(clubs, "Danh sách CLB", total));
+
+            var joinedClubIds = new HashSet<int>();
+            var pendingClubIds = new HashSet<int>();
+
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                joinedClubIds = await _context.ClubMembers
+                    .Where(m => m.UserId == CurrentUserId && m.Status == "Approved")
+                    .Select(m => m.ClubId)
+                    .ToListAsync()
+                    .ContinueWith(t => new HashSet<int>(t.Result));
+
+                pendingClubIds = await _context.ClubJoinRequests
+                    .Where(r => r.UserId == CurrentUserId && r.Status == "Pending")
+                    .Select(r => r.ClubId)
+                    .ToListAsync()
+                    .ContinueWith(t => new HashSet<int>(t.Result));
+            }
+
+            var result = clubs.Select(c => new ClubDetailDto(
+                c.ClubId,
+                c.ClubName,
+                c.Description,
+                c.Status,
+                c.PresidentId.Value,
+                c.President!.FullName,
+                c.ClubMembers.Count(m => m.Status == "Approved"),
+                c.CreatedAt.Value.ConvertToVietnamTime(),
+                c.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount,
+                joinedClubIds.Contains(c.ClubId),
+                pendingClubIds.Contains(c.ClubId)
+            )).ToList();
+
+            return Ok(ApiResponse<List<ClubDetailDto>>.SuccessResponse(result, "Danh sách CLB", total));
         }
+
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
@@ -162,12 +240,21 @@ namespace ClubManagementApi.Controllers
                 .Include(c => c.ClubMembers)
                 .Include(c => c.FeeSchedules)
                 .FirstOrDefaultAsync(c => c.ClubId == id);
-            if (club == null) return NotFound();
-            bool canView = User.IsInRole("Admin") ||
-                           club.PresidentId == CurrentUserId ||
-                           (club.Status == "Active" && await _context.ClubMembers.AnyAsync(m => m.ClubId == id && m.UserId == CurrentUserId && m.Status == "Approved"));
-            if (!canView)
+
+            if (club == null)
+                return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại"));
+
+            bool isPresident = club.PresidentId == CurrentUserId;
+            bool isAdmin = User.IsInRole("Admin");
+            bool isMember = await _context.ClubMembers
+                .AnyAsync(m => m.ClubId == id && m.UserId == CurrentUserId && m.Status == "Approved");
+
+            if (!isAdmin && !isPresident && !isMember)
                 return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền xem CLB này"));
+
+            bool hasPendingRequest = await _context.ClubJoinRequests
+                .AnyAsync(r => r.ClubId == id && r.UserId == CurrentUserId && r.Status == "Pending");
+
             var dto = new ClubDetailDto(
                 club.ClubId,
                 club.ClubName,
@@ -177,10 +264,14 @@ namespace ClubManagementApi.Controllers
                 club.President!.FullName,
                 club.ClubMembers.Count(m => m.Status == "Approved"),
                 club.CreatedAt.Value.ConvertToVietnamTime(),
-                club.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount
+                club.FeeSchedules.FirstOrDefault(f => f.Frequency == "OneTime" && f.IsRequiredFee)?.Amount,
+                isMember,
+                hasPendingRequest
             );
+
             return Ok(ApiResponse<ClubDetailDto>.SuccessResponse(dto));
         }
+
         [Authorize(Roles = "Student,ClubLeader")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateClubDto dto)
@@ -203,6 +294,23 @@ namespace ClubManagementApi.Controllers
             {
                 _context.Clubs.Add(club);
                 await _context.SaveChangesAsync();
+
+                var joinRequest = new ClubJoinRequest
+                {
+                    ClubId = club.ClubId,
+                    UserId = CurrentUserId,
+                    Status = "Approved",
+                    CreatedAt = TimeZoneHelper.NowInVietnam,
+                    StudentId = "CLUBLEADER",
+                    Major = "CLUBLEADER",
+                    AcademicYear = DateTime.Now.Year.ToString(),
+                    Introduction = "CLUBLEADER",
+                    Reason = "CLUBLEADER",
+                    ContactInfoOptional = null
+                };
+
+                await _context.SaveChangesAsync();
+                _context.ClubJoinRequests.Add(joinRequest);
                 _context.ClubMembers.Add(new ClubMember
                 {
                     ClubId = club.ClubId,
@@ -267,6 +375,7 @@ namespace ClubManagementApi.Controllers
                 "Tạo CLB thành công! Đang chờ Admin duyệt."
             ));
         }
+
         [Authorize(Roles = "ClubLeader,Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateClubDto dto)

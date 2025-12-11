@@ -53,6 +53,7 @@ namespace ClubManagementApi.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
+                new Claim("Role", user.Role),
                 new Claim("UserId", user.UserId.ToString()),
                 new Claim("FullName", user.FullName)
             };
