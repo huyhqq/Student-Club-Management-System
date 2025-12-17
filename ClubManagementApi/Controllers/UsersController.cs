@@ -1,14 +1,12 @@
-﻿using ClubManagementApi.Data;
-using ClubManagementApi.DTO;
-using ClubManagementApi.Helpers;
-using ClubManagementApi.Models;
-using ClubManagementApi.Params;
-using ClubManagementApi.Validator;
-using FluentValidation;
+﻿using ClubManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using BCrypt.Net;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ClubManagementApi.Controllers
 {
@@ -18,96 +16,211 @@ namespace ClubManagementApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly StudentClubContext _context;
-        private readonly IValidator<PaginationParams> _paginationValidator;
-        private readonly IValidator<UpdateUserRoleDto> _roleValidator;
-        private readonly IValidator<UpdateUserStatusDto> _statusValidator;
-        private readonly IValidator<CreateAdminUserDto> _createValidator;
-        private readonly IValidator<UpdateAdminUserDto> _updateValidator;
 
-        public UsersController(
-            StudentClubContext context,
-            IValidator<PaginationParams> paginationValidator,
-            IValidator<UpdateUserRoleDto> roleValidator,
-            IValidator<UpdateUserStatusDto> statusValidator,
-            IValidator<CreateAdminUserDto> createValidator,
-            IValidator<UpdateAdminUserDto> updateValidator)
+        public UsersController(StudentClubContext context)
         {
             _context = context;
-            _paginationValidator = paginationValidator;
-            _roleValidator = roleValidator;
-            _statusValidator = statusValidator;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
         }
 
-        private int CurrentUserId => JwtHelper.GetUserIdFromHttpContext(HttpContext);
+        private int CurrentUserId => GetUserIdFromHttpContext(HttpContext);
 
-        public record UserAdminDto(
-            int UserId,
-            string FullName,
-            string Email,
-            string? Phone,
-            string? StudentCode,
-            string Role,
-            string AccountStatus,
-            string? Avatar,
-            DateTime CreatedAt,
-            DateTime? LastLogin
-        );
+        public static int GetUserIdFromHttpContext(HttpContext? context, ILogger? logger = null)
+        {
+            if (context == null)
+            {
+                logger?.LogError("HttpContext is null in JwtHelper.GetUserIdFromHttpContext.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
 
-        public record CreateAdminUserDto(
-            string FullName,
-            string Email,
-            string Password,
-            string? Phone,
-            string? StudentCode,
-            string Role
-        );
+            if (context.User != null && context.User.Identity != null && context.User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = context.User.FindFirst("UserId")?.Value
+                               ?? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogInformation("Successfully retrieved UserId {UserId} from claims.", userId);
+                    return userId;
+                }
+                logger?.LogError("Invalid UserId claim: {UserIdClaim}", userIdClaim);
+                throw new UnauthorizedAccessException("ID người dùng không hợp lệ.");
+            }
 
-        public record UpdateAdminUserDto(
-            string FullName,
-            string Email,
-            string? Phone,
-            string? StudentCode,
-            string? Avatar
-        );
+            var token = context.Request.Query["access_token"].ToString();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                logger?.LogError("No access_token found in query parameters.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
 
-        public record UpdateUserRoleDto(string Role);
-        public record UpdateUserStatusDto(string AccountStatus);
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId" || c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    logger?.LogError("UserId or nameidentifier claim not found in token.");
+                    throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+                }
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogError("Invalid UserId format in token: {UserIdClaim}", userIdClaim);
+                    throw new UnauthorizedAccessException($"ID người dùng không hợp lệ: {userIdClaim}");
+                }
+
+                logger?.LogInformation("Successfully retrieved UserId {UserId} from access_token.", userId);
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to parse JWT token from access_token.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+        }
+
+        // ==================== DTO VỚI DATA ANNOTATIONS ====================
+
+        public class PaginationParams
+        {
+            [Range(1, int.MaxValue, ErrorMessage = "Số trang phải lớn hơn 0")]
+            public int PageNumber { get; set; } = 1;
+
+            [Range(1, 100, ErrorMessage = "Kích thước trang từ 1 đến 100")]
+            public int PageSize { get; set; } = 10;
+
+            public string? Search { get; set; }
+
+            public string? SortBy { get; set; } // "CreatedAt" hoặc "FullName"
+            public string? SortOrder { get; set; } // "asc" hoặc "desc"
+        }
+
+        public class CreateAdminUserDto
+        {
+            [Required(ErrorMessage = "Họ và tên là bắt buộc")]
+            [StringLength(100, MinimumLength = 2)]
+            public string FullName { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Email là bắt buộc")]
+            [EmailAddress(ErrorMessage = "Email không hợp lệ")]
+            public string Email { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
+            [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
+            public string Password { get; set; } = string.Empty;
+
+            [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+            public string? Phone { get; set; }
+
+            public string? StudentCode { get; set; }
+
+            [Required(ErrorMessage = "Vai trò là bắt buộc")]
+            [RegularExpression("^(Student|ClubLeader|Admin)$", ErrorMessage = "Vai trò chỉ có thể là Student, ClubLeader hoặc Admin")]
+            public string Role { get; set; } = string.Empty;
+        }
+
+        public class UpdateAdminUserDto
+        {
+            [Required(ErrorMessage = "Họ và tên là bắt buộc")]
+            [StringLength(100, MinimumLength = 2)]
+            public string FullName { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Email là bắt buộc")]
+            [EmailAddress]
+            public string Email { get; set; } = string.Empty;
+
+            [Phone]
+            public string? Phone { get; set; }
+
+            public string? StudentCode { get; set; }
+
+            public string? Avatar { get; set; }
+        }
+
+        public class UpdateUserRoleDto
+        {
+            [Required(ErrorMessage = "Vai trò là bắt buộc")]
+            [RegularExpression("^(Student|ClubLeader|Admin)$", ErrorMessage = "Vai trò không hợp lệ")]
+            public string Role { get; set; } = string.Empty;
+        }
+
+        public class UpdateUserStatusDto
+        {
+            [Required(ErrorMessage = "Trạng thái tài khoản là bắt buộc")]
+            [RegularExpression("^(Active|Locked|Disabled|PendingVerification)$", ErrorMessage = "Trạng thái tài khoản không hợp lệ")]
+            public string AccountStatus { get; set; } = string.Empty;
+        }
+
+        public class UserAdminDto
+        {
+            public int UserId { get; set; }
+            public string FullName { get; set; } = string.Empty;
+            public string Email { get; set; } = string.Empty;
+            public string? Phone { get; set; }
+            public string? StudentCode { get; set; }
+            public string Role { get; set; } = string.Empty;
+            public string AccountStatus { get; set; } = string.Empty;
+            public string? Avatar { get; set; }
+            public DateTime CreatedAt { get; set; }
+            public DateTime? LastLogin { get; set; }
+        }
+
+        // ==================== HÀM HỖ TRỢ ====================
+
+        private IActionResult ValidationErrorResponse()
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .Select(x => new { Field = x.Key, Message = x.Value?.Errors.First().ErrorMessage })
+                .ToList();
+
+            return BadRequest(ApiResponse<object>.FailResponse("Dữ liệu không hợp lệ", errors));
+        }
+
+        // ==================== CÁC ENDPOINT ====================
 
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaginationParams p)
         {
-            var validation = await _paginationValidator.ValidateAsync(p);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var query = _context.Users.AsQueryable();
 
             if (!string.IsNullOrEmpty(p.Search))
+            {
+                var search = p.Search.Trim();
                 query = query.Where(u =>
-                    u.FullName.Contains(p.Search.Trim()) ||
-                    u.Email.Contains(p.Search.Trim()) ||
-                    (u.StudentCode != null && u.StudentCode.Contains(p.Search.Trim())));
+                    u.FullName.Contains(search) ||
+                    u.Email.Contains(search) ||
+                    (u.StudentCode != null && u.StudentCode.Contains(search)));
+            }
+
+            // Sort đơn giản
+            query = (p.SortBy?.ToLower(), p.SortOrder?.ToLower()) switch
+            {
+                ("fullname", "asc") => query.OrderBy(u => u.FullName),
+                ("fullname", "desc") => query.OrderByDescending(u => u.FullName),
+                _ => query.OrderByDescending(u => u.CreatedAt)
+            };
 
             var total = await query.CountAsync();
 
             var users = await query
-                .OrderByDynamic(p.SortBy ?? "CreatedAt", p.SortOrder ?? "desc")
                 .Skip((p.PageNumber - 1) * p.PageSize)
                 .Take(p.PageSize)
-                .Select(u => new UserAdminDto(
-                    u.UserId,
-                    u.FullName,
-                    u.Email,
-                    u.Phone,
-                    u.StudentCode,
-                    u.Role,
-                    u.AccountStatus,
-                    u.Avatar,
-                    u.CreatedAt.Value.ConvertToVietnamTime(),
-                    u.LastLogin.HasValue ? u.LastLogin.Value.ConvertToVietnamTime() : null
-                ))
+                .Select(u => new UserAdminDto
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    StudentCode = u.StudentCode,
+                    Role = u.Role,
+                    AccountStatus = u.AccountStatus,
+                    Avatar = u.Avatar,
+                    CreatedAt = u.CreatedAt.Value.ConvertToVietnamTime(),
+                    LastLogin = u.LastLogin.HasValue ? u.LastLogin.Value.ConvertToVietnamTime() : null
+                })
                 .ToListAsync();
 
             return Ok(ApiResponse<List<UserAdminDto>>.SuccessResponse(users, "Lấy danh sách người dùng thành công", total));
@@ -117,21 +230,23 @@ namespace ClubManagementApi.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+
             if (user == null)
                 return NotFound(ApiResponse<object>.FailResponse("Không tìm thấy người dùng"));
 
-            var dto = new UserAdminDto(
-                user.UserId,
-                user.FullName,
-                user.Email,
-                user.Phone,
-                user.StudentCode,
-                user.Role,
-                user.AccountStatus,
-                user.Avatar,
-                user.CreatedAt.Value.ConvertToVietnamTime(),
-                user.LastLogin.HasValue ? user.LastLogin.Value.ConvertToVietnamTime() : null
-            );
+            var dto = new UserAdminDto
+            {
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                StudentCode = user.StudentCode,
+                Role = user.Role,
+                AccountStatus = user.AccountStatus,
+                Avatar = user.Avatar,
+                CreatedAt = user.CreatedAt.Value.ConvertToVietnamTime(),
+                LastLogin = user.LastLogin.HasValue ? user.LastLogin.Value.ConvertToVietnamTime() : null
+            };
 
             return Ok(ApiResponse<UserAdminDto>.SuccessResponse(dto));
         }
@@ -139,11 +254,9 @@ namespace ClubManagementApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateAdminUserDto dto)
         {
-            var validation = await _createValidator.ValidateAsync(dto);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email.Trim()))
+            if (await _context.Users.AnyAsync(u => u.Email.Trim() == dto.Email.Trim()))
                 return BadRequest(ApiResponse<object>.FailResponse("Email đã được sử dụng"));
 
             if (!string.IsNullOrEmpty(dto.StudentCode) &&
@@ -174,9 +287,7 @@ namespace ClubManagementApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateAdminUserDto dto)
         {
-            var validation = await _updateValidator.ValidateAsync(dto);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -185,7 +296,7 @@ namespace ClubManagementApi.Controllers
             if (user.UserId == CurrentUserId)
                 return BadRequest(ApiResponse<object>.FailResponse("Không thể cập nhật thông tin chính mình qua API này"));
 
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email.Trim() && u.UserId != id))
+            if (await _context.Users.AnyAsync(u => u.Email.Trim() == dto.Email.Trim() && u.UserId != id))
                 return BadRequest(ApiResponse<object>.FailResponse("Email đã được sử dụng"));
 
             if (!string.IsNullOrEmpty(dto.StudentCode) &&
@@ -206,9 +317,7 @@ namespace ClubManagementApi.Controllers
         [HttpPatch("{id}/role")]
         public async Task<IActionResult> UpdateRole(int id, [FromBody] UpdateUserRoleDto dto)
         {
-            var validation = await _roleValidator.ValidateAsync(dto);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -226,9 +335,7 @@ namespace ClubManagementApi.Controllers
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateUserStatusDto dto)
         {
-            var validation = await _statusValidator.ValidateAsync(dto);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)

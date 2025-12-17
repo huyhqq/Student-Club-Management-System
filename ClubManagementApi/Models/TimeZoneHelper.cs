@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace ClubManagementApi.Helpers
+namespace ClubManagementApi.Models
 {
     public static class TimeZoneHelper
     {

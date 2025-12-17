@@ -1,4 +1,4 @@
-﻿namespace ClubManagementApi.Params
+﻿namespace ClubManagementApi.Models
 {
     public class PaginationParams
     {

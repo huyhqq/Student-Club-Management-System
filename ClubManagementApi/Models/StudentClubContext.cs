@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using ClubManagementApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClubManagementApi.Data;
+namespace ClubManagementApi.Models;
 
 public partial class StudentClubContext : DbContext
 {

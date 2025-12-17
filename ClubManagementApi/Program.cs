@@ -2,11 +2,8 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
-using ClubManagementApi.Data;
-using ClubManagementApi.DTO;
+using ClubManagementApi.Models;
 using ClubManagementApi.Services;
-using ClubManagementApi.Validator;
-using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -50,11 +47,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddScoped<PayOSService>();
-// Configure DbContext
 builder.Services.AddDbContext<StudentClubContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -149,10 +143,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<StudentClubContext>();
-
     NotificationService.Initialize(context);
 }
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

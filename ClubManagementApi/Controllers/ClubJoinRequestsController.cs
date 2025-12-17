@@ -1,13 +1,10 @@
-﻿using ClubManagementApi.Data;
-using ClubManagementApi.DTO;
-using ClubManagementApi.Helpers;
-using ClubManagementApi.Models;
-using ClubManagementApi.Params;
-using ClubManagementApi.Services;
-using FluentValidation;
+﻿using ClubManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ClubManagementApi.Controllers
 {
@@ -16,51 +13,137 @@ namespace ClubManagementApi.Controllers
     public class ClubJoinRequestsController : ControllerBase
     {
         private readonly StudentClubContext _context;
-        private readonly IValidator<CreateJoinRequestDto> _createValidator;
-        private readonly IValidator<PaginationParams> _paginationValidator;
 
-        public ClubJoinRequestsController(
-            StudentClubContext context,
-            IValidator<CreateJoinRequestDto> createValidator,
-            IValidator<PaginationParams> paginationValidator)
+        public ClubJoinRequestsController(StudentClubContext context)
         {
             _context = context;
-            _createValidator = createValidator;
-            _paginationValidator = paginationValidator;
         }
 
-        private int CurrentUserId => JwtHelper.GetUserIdFromHttpContext(HttpContext);
+        private int CurrentUserId => GetUserIdFromHttpContext(HttpContext);
+        private string CurrentUserFullName => HttpContext.User.FindFirst("FullName")?.Value ?? "Người dùng";
 
-        public record CreateJoinRequestDto(
-            string StudentId,
-            string Major,
-            string AcademicYear,
-            string Introduction,
-            string Reason,
-            string? ContactInfoOptional
-        );
+        public static int GetUserIdFromHttpContext(HttpContext? context, ILogger? logger = null)
+        {
+            if (context == null)
+            {
+                logger?.LogError("HttpContext is null in JwtHelper.GetUserIdFromHttpContext.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
 
-        public record JoinRequestDto(
-            int RequestId,
-            int UserId,
-            string FullName,
-            string StudentId,
-            string Major,
-            string AcademicYear,
-            string Introduction,
-            string Reason,
-            string? ContactInfoOptional,
-            string? Status,
-            DateTime CreatedAt
-        );
+            if (context.User != null && context.User.Identity != null && context.User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = context.User.FindFirst("UserId")?.Value
+                               ?? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogInformation("Successfully retrieved UserId {UserId} from claims.", userId);
+                    return userId;
+                }
+                logger?.LogError("Invalid UserId claim: {UserIdClaim}", userIdClaim);
+                throw new UnauthorizedAccessException("ID người dùng không hợp lệ.");
+            }
+
+            var token = context.Request.Query["access_token"].ToString();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                logger?.LogError("No access_token found in query parameters.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId" || c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    logger?.LogError("UserId or nameidentifier claim not found in token.");
+                    throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+                }
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogError("Invalid UserId format in token: {UserIdClaim}", userIdClaim);
+                    throw new UnauthorizedAccessException($"ID người dùng không hợp lệ: {userIdClaim}");
+                }
+
+                logger?.LogInformation("Successfully retrieved UserId {UserId} from access_token.", userId);
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to parse JWT token from access_token.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+        }
+
+
+        public class CreateJoinRequestDto
+        {
+            [Required(ErrorMessage = "Mã sinh viên là bắt buộc")]
+            [StringLength(20, MinimumLength = 5, ErrorMessage = "Mã sinh viên phải từ 5 đến 20 ký tự")]
+            public string StudentId { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Ngành học là bắt buộc")]
+            [StringLength(200, MinimumLength = 2)]
+            public string Major { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Năm học là bắt buộc")]
+            [RegularExpression(@"^\d{4}-\d{4}$", ErrorMessage = "Năm học phải định dạng YYYY-YYYY (ví dụ: 2023-2024)")]
+            public string AcademicYear { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Giới thiệu bản thân là bắt buộc")]
+            [MinLength(20, ErrorMessage = "Giới thiệu phải ít nhất 20 ký tự")]
+            public string Introduction { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Lý do tham gia là bắt buộc")]
+            [MinLength(20, ErrorMessage = "Lý do phải ít nhất 20 ký tự")]
+            public string Reason { get; set; } = string.Empty;
+
+            [StringLength(200)]
+            public string? ContactInfoOptional { get; set; }
+        }
+
+        public class PaginationParams
+        {
+            [Range(1, int.MaxValue, ErrorMessage = "Số trang phải lớn hơn 0")]
+            public int PageNumber { get; set; } = 1;
+
+            [Range(1, 100, ErrorMessage = "Kích thước trang phải từ 1 đến 100")]
+            public int PageSize { get; set; } = 10;
+        }
+
+        public class JoinRequestDto
+        {
+            public int RequestId { get; set; }
+            public int UserId { get; set; }
+            public string FullName { get; set; } = string.Empty;
+            public string StudentId { get; set; } = string.Empty;
+            public string Major { get; set; } = string.Empty;
+            public string AcademicYear { get; set; } = string.Empty;
+            public string Introduction { get; set; } = string.Empty;
+            public string Reason { get; set; } = string.Empty;
+            public string? ContactInfoOptional { get; set; }
+            public string? Status { get; set; }
+            public DateTime CreatedAt { get; set; }
+        }
+
+        private IActionResult ValidationErrorResponse()
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .Select(x => new { Field = x.Key, Message = x.Value?.Errors.First().ErrorMessage })
+                .ToList();
+
+            return BadRequest(ApiResponse<object>.FailResponse("Dữ liệu không hợp lệ", errors));
+        }
+
 
         [Authorize(Roles = "Student")]
         [HttpPost]
         public async Task<IActionResult> Create(int clubId, [FromBody] CreateJoinRequestDto dto)
         {
-            var validation = await _createValidator.ValidateAsync(dto);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var club = await _context.Clubs
                 .FirstOrDefaultAsync(c => c.ClubId == clubId && c.Status == "Active");
@@ -97,7 +180,7 @@ namespace ClubManagementApi.Controllers
             _context.ClubJoinRequests.Add(request);
             await _context.SaveChangesAsync();
 
-            TaskHelper.FireAndForget(async () =>
+            FireAndForget(async () =>
             {
                 var president = await _context.Clubs
                     .Where(c => c.ClubId == clubId)
@@ -109,7 +192,7 @@ namespace ClubManagementApi.Controllers
                     await NotificationService.SendAsync(
                         president.UserId,
                         "Yêu cầu tham gia CLB mới",
-                        $"Sinh viên {User.FindFirst("FullName")?.Value} muốn tham gia CLB {club.ClubName}"
+                        $"Sinh viên {CurrentUserFullName} (MSSV: {dto.StudentId}) muốn tham gia CLB {club.ClubName}"
                     );
                 }
             });
@@ -124,16 +207,12 @@ namespace ClubManagementApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetByClub(int clubId, [FromQuery] PaginationParams p, [FromQuery] string? status = null)
         {
-            var validation = await _paginationValidator.ValidateAsync(p);
-            if (!validation.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse(validation.Errors.First().ErrorMessage));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var club = await _context.Clubs.FindAsync(clubId);
-            if (club == null) return NotFound();
+            if (club == null) return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại"));
 
-            bool canView = User.IsInRole("Admin") ||
-                           club.PresidentId == CurrentUserId;
-
+            bool canView = User.IsInRole("Admin") || club.PresidentId == CurrentUserId;
             if (!canView)
                 return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền xem danh sách yêu cầu của CLB này"));
 
@@ -152,19 +231,20 @@ namespace ClubManagementApi.Controllers
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((p.PageNumber - 1) * p.PageSize)
                 .Take(p.PageSize)
-                .Select(r => new JoinRequestDto(
-                    r.RequestId,
-                    r.UserId,
-                    r.User.FullName,
-                    r.StudentId,
-                    r.Major,
-                    r.AcademicYear,
-                    r.Introduction,
-                    r.Reason,
-                    r.ContactInfoOptional,
-                    r.Status,
-                    r.CreatedAt.Value.ConvertToVietnamTime()
-                ))
+                .Select(r => new JoinRequestDto
+                {
+                    RequestId = r.RequestId,
+                    UserId = r.UserId,
+                    FullName = r.User.FullName,
+                    StudentId = r.StudentId,
+                    Major = r.Major,
+                    AcademicYear = r.AcademicYear,
+                    Introduction = r.Introduction,
+                    Reason = r.Reason,
+                    ContactInfoOptional = r.ContactInfoOptional,
+                    Status = r.Status,
+                    CreatedAt = r.CreatedAt.Value.ConvertToVietnamTime()
+                })
                 .ToListAsync();
 
             return Ok(ApiResponse<List<JoinRequestDto>>.SuccessResponse(requests, "Danh sách yêu cầu tham gia CLB", total));
@@ -179,13 +259,12 @@ namespace ClubManagementApi.Controllers
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId && r.ClubId == clubId);
 
-            if (request == null) return NotFound();
+            if (request == null) return NotFound(ApiResponse<object>.FailResponse("Yêu cầu không tồn tại"));
+
             if (request.Status != "Pending")
                 return BadRequest(ApiResponse<object>.FailResponse("Yêu cầu này đã được xử lý"));
 
-            bool canApprove = User.IsInRole("Admin") ||
-                              request.Club.PresidentId == CurrentUserId;
-
+            bool canApprove = User.IsInRole("Admin") || request.Club.PresidentId == CurrentUserId;
             if (!canApprove)
                 return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền duyệt yêu cầu này"));
 
@@ -203,7 +282,6 @@ namespace ClubManagementApi.Controllers
                     JoinedDate = TimeZoneHelper.NowInVietnam
                 };
                 _context.ClubMembers.Add(member);
-
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -213,7 +291,7 @@ namespace ClubManagementApi.Controllers
                 throw;
             }
 
-            TaskHelper.FireAndForget(async () =>
+            FireAndForget(async () =>
             {
                 await NotificationService.SendAsync(
                     request.UserId,
@@ -248,20 +326,19 @@ namespace ClubManagementApi.Controllers
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId && r.ClubId == clubId);
 
-            if (request == null) return NotFound();
+            if (request == null) return NotFound(ApiResponse<object>.FailResponse("Yêu cầu không tồn tại"));
+
             if (request.Status != "Pending")
                 return BadRequest(ApiResponse<object>.FailResponse("Yêu cầu này đã được xử lý"));
 
-            bool canReject = User.IsInRole("Admin") ||
-                             request.Club.PresidentId == CurrentUserId;
-
+            bool canReject = User.IsInRole("Admin") || request.Club.PresidentId == CurrentUserId;
             if (!canReject)
                 return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền từ chối yêu cầu này"));
 
             request.Status = "Rejected";
             await _context.SaveChangesAsync();
 
-            TaskHelper.FireAndForget(async () =>
+            FireAndForget(async () =>
             {
                 await NotificationService.SendAsync(
                     request.UserId,
@@ -271,6 +348,21 @@ namespace ClubManagementApi.Controllers
             });
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "Từ chối yêu cầu tham gia thành công"));
+        }
+
+        private static void FireAndForget(Func<Task> taskFunc)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await taskFunc();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"FireAndForget error: {ex}");
+                }
+            });
         }
     }
 }

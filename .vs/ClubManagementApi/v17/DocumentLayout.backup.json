@@ -3,16 +3,40 @@
   "WorkspaceRootPath": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\params\\paginationparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\params\\paginationparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\validator\\authdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\validator\\authdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubjoinrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubjoinrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\params\\paginationparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\params\\paginationparams.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\validator\\joinclubrequestdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -21,18 +45,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\services\\notificationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubjoinrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubjoinrequestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\profilecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubmemberscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\validator\\clubjoinrequestvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -51,20 +63,8 @@
       "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\helpers\\cloudinaryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\clubscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\validator\\paginationparamsvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\validator\\paginationparamsvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|d:\\api cryud\\demo\\clubmanagementapicrud\\clubmanagementapi\\validator\\authdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D00A2CB3-E604-4CE4-B4B9-59DEF642F37F}|ClubManagementApi\\ClubManagementApi.csproj|solutionrelative:clubmanagementapi\\validator\\authdtovalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -74,61 +74,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "PaginationParams.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Params\\PaginationParams.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Params\\PaginationParams.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Params\\PaginationParams.cs",
-              "RelativeToolTip": "ClubManagementApi\\Params\\PaginationParams.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T09:23:08.18Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ProfileController.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ProfileController.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ProfileController.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ProfileController.cs",
-              "RelativeToolTip": "ClubManagementApi\\Controllers\\ProfileController.cs",
-              "ViewState": "AgIAAHUAAAAAAAAAAAA7wHcAAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-08T08:29:32.194Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ClubJoinRequestsController.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
-              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
-              "ViewState": "AgIAANMAAAAAAAAAAAAwwPEAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-08T08:19:05.462Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "JoinClubRequestDtoValidator.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
-              "RelativeToolTip": "ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-08T08:18:10.842Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 4,
               "Title": "ClubMembersController.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubMembersController.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubMembersController.cs",
@@ -140,40 +90,77 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\UsersController.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAPYAAAAAAAAAAAA+wAgBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-04T07:53:55.769Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ClubsController.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubsController.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubsController.cs",
+              "ViewState": "AgIAACoBAAAAAAAAAAAAAM4BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-06T17:31:17.999Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ClubJoinRequestsController.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubJoinRequestsController.cs",
+              "ViewState": "AgIAANMAAAAAAAAAAAAwwPEAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T08:19:05.462Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Program.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Program.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Program.cs",
-              "RelativeToolTip": "ClubManagementApi\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEoAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-08T08:28:19.28Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "NotificationService.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Services\\NotificationService.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Services\\NotificationService.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Services\\NotificationService.cs",
-              "RelativeToolTip": "ClubManagementApi\\Services\\NotificationService.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAuwAoAAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T05:34:54.73Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
               "Title": "AuthController.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\AuthController.cs",
               "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\AuthController.cs",
               "RelativeToolTip": "ClubManagementApi\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAACkAAAAAAAAAAAAgwKwBAAABAAAAAAAAAA==",
+              "ViewState": "AgIAANwAAAAAAAAAAAAwwBEAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-06T17:28:41.093Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AuthDtoValidator.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\AuthDtoValidator.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\AuthDtoValidator.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\AuthDtoValidator.cs",
+              "RelativeToolTip": "ClubManagementApi\\Validator\\AuthDtoValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T08:19:46.358Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Program.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Program.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Program.cs",
+              "RelativeToolTip": "ClubManagementApi\\Program.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAAAEoAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T08:28:19.28Z",
               "EditorCaption": ""
             },
             {
@@ -186,7 +173,55 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ProfileController.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ProfileController.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ProfileController.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ProfileController.cs",
+              "RelativeToolTip": "ClubManagementApi\\Controllers\\ProfileController.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAwAoAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T08:29:32.194Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "JoinClubRequestDtoValidator.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
+              "RelativeToolTip": "ClubManagementApi\\Validator\\JoinClubRequestDtoValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-08T08:18:10.842Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "PaginationParams.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Params\\PaginationParams.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Params\\PaginationParams.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Params\\PaginationParams.cs",
+              "RelativeToolTip": "ClubManagementApi\\Params\\PaginationParams.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-09T09:23:08.18Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 10,
+              "Title": "NotificationService.cs",
+              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Services\\NotificationService.cs",
+              "RelativeDocumentMoniker": "ClubManagementApi\\Services\\NotificationService.cs",
+              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Services\\NotificationService.cs",
+              "RelativeToolTip": "ClubManagementApi\\Services\\NotificationService.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAuwAoAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-09T05:34:54.73Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
               "Title": "CloudinarySettings.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\DTO\\CloudinarySettings.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\DTO\\CloudinarySettings.cs",
@@ -198,7 +233,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 12,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\appsettings.json",
               "RelativeDocumentMoniker": "ClubManagementApi\\appsettings.json",
@@ -210,7 +245,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 11,
               "Title": "ClubJoinRequestValidator.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\ClubJoinRequestValidator.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\ClubJoinRequestValidator.cs",
@@ -222,7 +257,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 14,
               "Title": "CloudinaryService.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Helpers\\CloudinaryService.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\Helpers\\CloudinaryService.cs",
@@ -234,31 +269,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "ClubsController.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\ClubsController.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\ClubsController.cs",
-              "RelativeToolTip": "ClubManagementApi\\Controllers\\ClubsController.cs",
-              "ViewState": "AgIAACoBAAAAAAAAAAAAAM4BAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-06T17:31:17.999Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "UsersController.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Controllers\\UsersController.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Controllers\\UsersController.cs",
-              "RelativeToolTip": "ClubManagementApi\\Controllers\\UsersController.cs",
-              "ViewState": "AgIAAPYAAAAAAAAAAAAuwAgBAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-04T07:53:55.769Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "PaginationParamsValidator.cs",
               "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\PaginationParamsValidator.cs",
               "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\PaginationParamsValidator.cs",
@@ -267,18 +278,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-08T08:19:49.482Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "AuthDtoValidator.cs",
-              "DocumentMoniker": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\AuthDtoValidator.cs",
-              "RelativeDocumentMoniker": "ClubManagementApi\\Validator\\AuthDtoValidator.cs",
-              "ToolTip": "D:\\api cryud\\DEMO\\ClubManagementApiCRUD\\ClubManagementApi\\Validator\\AuthDtoValidator.cs",
-              "RelativeToolTip": "ClubManagementApi\\Validator\\AuthDtoValidator.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-08T08:19:46.358Z"
             }
           ]
         }

@@ -1,8 +1,5 @@
-﻿using ClubManagementApi.Data;
-using ClubManagementApi.Models;
-using ClubManagementApi.Helpers;
-
-namespace ClubManagementApi.Services
+﻿
+namespace ClubManagementApi.Models
 {
     public static class NotificationService
     {

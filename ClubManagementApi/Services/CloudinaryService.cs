@@ -1,17 +1,14 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using ClubManagementApi.DTO;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 public class CloudinaryService
 {
     private readonly Cloudinary _cloudinary;
 
-    public CloudinaryService(IOptions<CloudinarySettings> config)
+    public CloudinaryService()
     {
-        var settings = config.Value;
-        var account = new Account(settings.CloudName, settings.ApiKey, settings.ApiSecret);
+        var account = new Account("dx0cuyelf","925884146245936", "UsFUtGlS_dTvxVSPn_S3OBklwZU");
         _cloudinary = new Cloudinary(account) { Api = { Secure = true } };
     }
 
@@ -29,5 +26,12 @@ public class CloudinaryService
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
         return uploadResult.SecureUrl.ToString();
+    }
+
+    public class CloudinarySettings
+    {
+        public string CloudName { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
+        public string ApiSecret { get; set; } = string.Empty;
     }
 }

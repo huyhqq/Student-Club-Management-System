@@ -1,38 +1,138 @@
-﻿using ClubManagementApi.DTO;
-using ClubManagementApi.Models;
-using ClubManagementApi.Helpers;
-using ClubManagementApi.Services;
+﻿using ClubManagementApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClubManagementApi.Data;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace ClubManagementApi.Controllers
 {
     [Authorize]
     [Route("api/club-members")]
+    [ApiController]
     public class ClubMembersController : ControllerBase
     {
         private readonly StudentClubContext _context;
-        public ClubMembersController(StudentClubContext context) => _context = context;
 
-        private int CurrentUserId => JwtHelper.GetUserIdFromHttpContext(HttpContext);
+        public ClubMembersController(StudentClubContext context)
+        {
+            _context = context;
+        }
 
-        public record JoinClubRequestDto(
-            int ClubId,
-            string StudentId,
-            string Major,
-            string AcademicYear,
-            string Introduction,
-            string Reason,
-            string? ContactInfoOptional
-        );
+        private int CurrentUserId => GetUserIdFromHttpContext(HttpContext);
+        private string CurrentUserFullName => HttpContext.User.FindFirst("FullName")?.Value ?? "Một thành viên";
+
+        public static int GetUserIdFromHttpContext(HttpContext? context, ILogger? logger = null)
+        {
+            if (context == null)
+            {
+                logger?.LogError("HttpContext is null in JwtHelper.GetUserIdFromHttpContext.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+
+            if (context.User != null && context.User.Identity != null && context.User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = context.User.FindFirst("UserId")?.Value
+                               ?? context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!string.IsNullOrEmpty(userIdClaim) && int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogInformation("Successfully retrieved UserId {UserId} from claims.", userId);
+                    return userId;
+                }
+                logger?.LogError("Invalid UserId claim: {UserIdClaim}", userIdClaim);
+                throw new UnauthorizedAccessException("ID người dùng không hợp lệ.");
+            }
+
+            var token = context.Request.Query["access_token"].ToString();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                logger?.LogError("No access_token found in query parameters.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId" || c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                {
+                    logger?.LogError("UserId or nameidentifier claim not found in token.");
+                    throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+                }
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                {
+                    logger?.LogError("Invalid UserId format in token: {UserIdClaim}", userIdClaim);
+                    throw new UnauthorizedAccessException($"ID người dùng không hợp lệ: {userIdClaim}");
+                }
+
+                logger?.LogInformation("Successfully retrieved UserId {UserId} from access_token.", userId);
+                return userId;
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Failed to parse JWT token from access_token.");
+                throw new UnauthorizedAccessException("Bạn chưa đăng nhập.");
+            }
+        }
+
+
+        public class JoinClubRequestDto
+        {
+            [Required(ErrorMessage = "ID CLB là bắt buộc")]
+            [Range(1, int.MaxValue, ErrorMessage = "ID CLB không hợp lệ")]
+            public int ClubId { get; set; }
+
+            [Required(ErrorMessage = "Mã sinh viên là bắt buộc")]
+            [StringLength(20, MinimumLength = 5, ErrorMessage = "Mã sinh viên phải từ 5 đến 20 ký tự")]
+            public string StudentId { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Ngành học là bắt buộc")]
+            [StringLength(200, MinimumLength = 2)]
+            public string Major { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Năm học là bắt buộc")]
+            [RegularExpression(@"^\d{4}-\d{4}$", ErrorMessage = "Năm học phải có định dạng YYYY-YYYY (ví dụ: 2023-2024)")]
+            public string AcademicYear { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Giới thiệu bản thân là bắt buộc")]
+            [MinLength(50, ErrorMessage = "Giới thiệu phải ít nhất 50 ký tự")]
+            public string Introduction { get; set; } = string.Empty;
+
+            [Required(ErrorMessage = "Lý do tham gia là bắt buộc")]
+            [MinLength(50, ErrorMessage = "Lý do phải ít nhất 50 ký tự")]
+            public string Reason { get; set; } = string.Empty;
+
+            [StringLength(200)]
+            public string? ContactInfoOptional { get; set; }
+        }
+
+        public class ClubIdDto
+        {
+            [Required(ErrorMessage = "ID CLB là bắt buộc")]
+            [Range(1, int.MaxValue)]
+            public int ClubId { get; set; }
+        }
+
+
+        private IActionResult ValidationErrorResponse()
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .Select(x => new { Field = x.Key, Message = x.Value?.Errors.First().ErrorMessage })
+                .ToList();
+
+            return BadRequest(ApiResponse<object>.FailResponse("Dữ liệu không hợp lệ", errors));
+        }
+
+        // ==================== CÁC ENDPOINT ====================
 
         [HttpPost("join")]
         public async Task<IActionResult> JoinClub([FromBody] JoinClubRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<object>.FailResponse("Vui lòng nhập đầy đủ thông tin"));
+            if (!ModelState.IsValid) return ValidationErrorResponse();
 
             var clubId = dto.ClubId;
 
@@ -48,7 +148,10 @@ namespace ClubManagementApi.Controllers
             if (alreadyRequested)
                 return BadRequest(ApiResponse<object>.FailResponse("Bạn đã gửi yêu cầu tham gia, đang chờ duyệt"));
 
-            var club = await _context.Clubs.FirstOrDefaultAsync(c => c.ClubId == clubId && c.Status == "Active");
+            var club = await _context.Clubs
+                .Include(c => c.President)
+                .FirstOrDefaultAsync(c => c.ClubId == clubId && c.Status == "Active");
+
             if (club == null)
                 return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại hoặc chưa được kích hoạt"));
 
@@ -69,34 +172,36 @@ namespace ClubManagementApi.Controllers
             _context.ClubJoinRequests.Add(joinRequest);
             await _context.SaveChangesAsync();
 
-            TaskHelper.FireAndForget(async () =>
+            FireAndForget(async () =>
             {
-                var president = await _context.Users.FindAsync(club.PresidentId);
-                var userName = User.FindFirst("FullName")?.Value ?? "Một thành viên";
-                await NotificationService.SendAsync(
-                    president!.UserId,
-                    "Yêu cầu tham gia CLB mới",
-                    $"{userName} muốn tham gia CLB {club.ClubName}"
-                );
+                if (club.President != null)
+                {
+                    await NotificationService.SendAsync(
+                        club.President.UserId,
+                        "Yêu cầu tham gia CLB mới",
+                        $"{CurrentUserFullName} (MSSV: {dto.StudentId}) muốn tham gia CLB {club.ClubName}"
+                    );
+                }
             });
 
             return Ok(ApiResponse<string>.SuccessResponse(null, "Gửi yêu cầu tham gia thành công! Vui lòng chờ duyệt."));
         }
 
         [HttpPatch("{requestId}/approve")]
-        [Authorize(Roles = "ClubLeader")]
+        [Authorize(Roles = "ClubLeader,Admin")]
         public async Task<IActionResult> ApproveMember(int requestId)
         {
             var request = await _context.ClubJoinRequests
                 .Include(r => r.Club)
+                .ThenInclude(c => c!.President)
                 .Include(r => r.User)
                 .FirstOrDefaultAsync(r => r.RequestId == requestId && r.Status == "Pending");
 
             if (request == null)
                 return NotFound(ApiResponse<object>.FailResponse("Yêu cầu không tồn tại hoặc đã được xử lý"));
 
-            if (request.Club.PresidentId != CurrentUserId)
-                return Forbid("Bạn không phải chủ nhiệm CLB này");
+            if (request.Club.PresidentId != CurrentUserId && !User.IsInRole("Admin"))
+                return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền duyệt yêu cầu này"));
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -116,104 +221,38 @@ namespace ClubManagementApi.Controllers
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
-            catch (Exception)
+            catch
             {
                 await transaction.RollbackAsync();
                 return StatusCode(500, ApiResponse<object>.FailResponse("Duyệt thành viên thất bại"));
             }
 
-            TaskHelper.FireAndForget(() =>
-                NotificationService.SendAsync(
+            FireAndForget(async () =>
+            {
+                await NotificationService.SendAsync(
                     request.UserId,
                     "Chúc mừng! Bạn đã được duyệt vào CLB",
-                    $"Bạn đã chính thức trở thành thành viên của CLB {request.Club.ClubName}!"
-                ));
+                    $"Bạn đã chính thức trở thành thành viên của CLB \"{request.Club.ClubName}\"!"
+                );
+            });
 
-            return Ok(ApiResponse<String>.SuccessResponse("Duyệt thành viên thành công"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Duyệt thành viên thành công"));
         }
 
-
-        [HttpPatch("{id}/remove")]
-        [Authorize(Roles = "ClubLeader")]
-        public async Task<IActionResult> RemoveMember(int id)
+        [HttpPatch("{memberId}/remove")]
+        [Authorize(Roles = "ClubLeader,Admin")]
+        public async Task<IActionResult> RemoveMember(int memberId)
         {
-            var member = await _context.ClubMembers
-                .Include(r => r.Club)
-                .FirstOrDefaultAsync(r => r.MemberId == id);
-
-            if (member != null)
-            {
-
-
-                var memberRequest = await _context.ClubJoinRequests
-                    .FirstOrDefaultAsync(m => m.UserId == member.UserId);
-
-                if (memberRequest != null)
-                {
-                    _context.ClubJoinRequests.Remove(memberRequest);
-                    await _context.SaveChangesAsync();
-                    TaskHelper.FireAndForget(() =>
-                  NotificationService.SendAsync(
-                      member.UserId,
-                      "Bạn đã bị xóa khỏi CLB",
-                      $"Bạn đã bị xóa khỏi CLB {member.Club.ClubName} bởi chủ nhiệm."
-                  ));
-                }
-
-                _context.ClubMembers.Remove(member);
-
-                await _context.SaveChangesAsync();
-
-                TaskHelper.FireAndForget(() =>
-                    NotificationService.SendAsync(
-                        member.UserId,
-                        "Bạn đã bị xóa khỏi CLB",
-                        $"Bạn đã bị xóa khỏi CLB {member.Club.ClubName} bởi chủ nhiệm."
-                    ));
-
-                return Ok(ApiResponse<String>.SuccessResponse("Đã xóa thành viên thành công"));
-            }
-            return Ok(ApiResponse<string>.SuccessResponse("Đã xóa thành viên thành công"));
-
-        }
-
-        [HttpPatch("{id}/reject")]
-        [Authorize(Roles = "ClubLeader")]
-        public async Task<IActionResult> RejectOrRemove(int id)
-        {
-            var pendingRequest = await _context.ClubJoinRequests
-                .Include(r => r.Club)
-                .FirstOrDefaultAsync(r => r.RequestId == id && r.Status == "Pending");
-
-            if (pendingRequest != null)
-            {
-                if (pendingRequest.Club.PresidentId != CurrentUserId)
-                    return Forbid("Bạn không có quyền");
-
-                pendingRequest.Status = "Rejected";
-                pendingRequest.ApprovedAt = TimeZoneHelper.NowInVietnam;
-
-                await _context.SaveChangesAsync();
-
-                TaskHelper.FireAndForget(() =>
-                    NotificationService.SendAsync(
-                        pendingRequest.UserId,
-                        "Yêu cầu tham gia bị từ chối",
-                        $"Rất tiếc, yêu cầu tham gia CLB {pendingRequest.Club.ClubName} đã bị từ chối."
-                    ));
-
-                return Ok(ApiResponse<String>.SuccessResponse("Đã từ chối yêu cầu tham gia"));
-            }
-
             var member = await _context.ClubMembers
                 .Include(m => m.Club)
-                .FirstOrDefaultAsync(m => m.MemberId == id && m.Status == "Approved");
+                .ThenInclude(c => c!.President)
+                .FirstOrDefaultAsync(m => m.MemberId == memberId && m.Status == "Approved");
 
             if (member == null)
                 return NotFound(ApiResponse<object>.FailResponse("Thành viên không tồn tại"));
 
-            if (member.Club.PresidentId != CurrentUserId)
-                return Forbid("Bạn không có quyền");
+            if (member.Club.PresidentId != CurrentUserId && !User.IsInRole("Admin"))
+                return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền xóa thành viên này"));
 
             if (member.UserId == member.Club.PresidentId)
                 return BadRequest(ApiResponse<object>.FailResponse("Không thể xóa chủ nhiệm CLB"));
@@ -221,22 +260,57 @@ namespace ClubManagementApi.Controllers
             member.Status = "Removed";
             await _context.SaveChangesAsync();
 
-            TaskHelper.FireAndForget(() =>
-                NotificationService.SendAsync(
+            FireAndForget(async () =>
+            {
+                await NotificationService.SendAsync(
                     member.UserId,
                     "Bạn đã bị xóa khỏi CLB",
-                    $"Bạn đã bị xóa khỏi CLB {member.Club.ClubName} bởi chủ nhiệm."
-                ));
+                    $"Bạn đã bị xóa khỏi CLB \"{member.Club.ClubName}\" bởi chủ nhiệm."
+                );
+            });
 
-            return Ok(ApiResponse<String>.SuccessResponse("Đã xóa thành viên thành công"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Đã xóa thành viên thành công"));
+        }
+
+        [HttpPatch("{requestId}/reject")]
+        [Authorize(Roles = "ClubLeader,Admin")]
+        public async Task<IActionResult> RejectRequest(int requestId)
+        {
+            var request = await _context.ClubJoinRequests
+                .Include(r => r.Club)
+                .ThenInclude(c => c!.President)
+                .FirstOrDefaultAsync(r => r.RequestId == requestId && r.Status == "Pending");
+
+            if (request == null)
+                return NotFound(ApiResponse<object>.FailResponse("Yêu cầu không tồn tại hoặc đã được xử lý"));
+
+            if (request.Club.PresidentId != CurrentUserId && !User.IsInRole("Admin"))
+                return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền từ chối yêu cầu này"));
+
+            request.Status = "Rejected";
+            await _context.SaveChangesAsync();
+
+            FireAndForget(async () =>
+            {
+                await NotificationService.SendAsync(
+                    request.UserId,
+                    "Yêu cầu tham gia bị từ chối",
+                    $"Rất tiếc, yêu cầu tham gia CLB \"{request.Club.ClubName}\" của bạn đã bị từ chối."
+                );
+            });
+
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Đã từ chối yêu cầu tham gia"));
         }
 
         [HttpPost("leave")]
-        public async Task<IActionResult> LeaveClub([FromBody] int clubId)
+        public async Task<IActionResult> LeaveClub([FromBody] ClubIdDto dto)
         {
+            if (!ModelState.IsValid) return ValidationErrorResponse();
+
             var member = await _context.ClubMembers
                 .Include(m => m.Club)
-                .FirstOrDefaultAsync(m => m.ClubId == clubId && m.UserId == CurrentUserId && m.Status == "Approved");
+                .ThenInclude(c => c!.President)
+                .FirstOrDefaultAsync(m => m.ClubId == dto.ClubId && m.UserId == CurrentUserId && m.Status == "Approved");
 
             if (member == null)
                 return BadRequest(ApiResponse<object>.FailResponse("Bạn không phải thành viên của CLB này"));
@@ -247,29 +321,33 @@ namespace ClubManagementApi.Controllers
             member.Status = "Removed";
             await _context.SaveChangesAsync();
 
-            TaskHelper.FireAndForget(() =>
-                NotificationService.SendAsync(
-                    member.Club.PresidentId.Value,
+            FireAndForget(async () =>
+            {
+                await NotificationService.SendAsync(
+                    member.Club.PresidentId!.Value,
                     "Thành viên đã rời CLB",
-                    $"{User.FindFirst("FullName")?.Value ?? "Một thành viên"} đã rời khỏi CLB {member.Club.ClubName}"
-                ));
+                    $"{CurrentUserFullName} đã rời khỏi CLB {member.Club.ClubName}"
+                );
+            });
 
-            return Ok(ApiResponse<String>.SuccessResponse("Bạn đã rời CLB thành công"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Bạn đã rời CLB thành công"));
         }
 
         [HttpPost("cancel-request")]
-        public async Task<IActionResult> CancelRequest([FromBody] int clubId)
+        public async Task<IActionResult> CancelRequest([FromBody] ClubIdDto dto)
         {
+            if (!ModelState.IsValid) return ValidationErrorResponse();
+
             var request = await _context.ClubJoinRequests
-                .FirstOrDefaultAsync(r => r.ClubId == clubId && r.UserId == CurrentUserId && r.Status == "Pending");
+                .FirstOrDefaultAsync(r => r.ClubId == dto.ClubId && r.UserId == CurrentUserId && r.Status == "Pending");
 
             if (request == null)
-                return BadRequest(ApiResponse<object>.FailResponse("Không tìm thấy yêu cầu"));
+                return BadRequest(ApiResponse<object>.FailResponse("Không tìm thấy yêu cầu đang chờ duyệt"));
 
             _context.ClubJoinRequests.Remove(request);
             await _context.SaveChangesAsync();
 
-            return Ok(ApiResponse<String>.SuccessResponse("Đã hủy yêu cầu tham gia"));
+            return Ok(ApiResponse<string>.SuccessResponse(null, "Đã hủy yêu cầu tham gia"));
         }
 
         [HttpGet("my-clubs")]
@@ -278,7 +356,7 @@ namespace ClubManagementApi.Controllers
             var clubs = await _context.ClubMembers
                 .Where(m => m.UserId == CurrentUserId && m.Status == "Approved")
                 .Include(m => m.Club)
-                .ThenInclude(c => c.President)
+                .ThenInclude(c => c!.President)
                 .Select(m => new
                 {
                     m.Club.ClubId,
@@ -289,19 +367,24 @@ namespace ClubManagementApi.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(ApiResponse<Object>.SuccessResponse(clubs));
+            return Ok(ApiResponse<object>.SuccessResponse(clubs));
         }
 
         [HttpGet("{clubId}/members")]
         public async Task<IActionResult> GetMembers(int clubId)
         {
-            var club = await _context.Clubs.Include(c => c.President).FirstOrDefaultAsync(c => c.ClubId == clubId);
-            if (club == null) return NotFound();
+            var club = await _context.Clubs
+                .Include(c => c.President)
+                .FirstOrDefaultAsync(c => c.ClubId == clubId);
+
+            if (club == null) return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại"));
 
             var isLeader = club.PresidentId == CurrentUserId;
-            var isMember = await _context.ClubMembers.AnyAsync(m => m.ClubId == clubId && m.UserId == CurrentUserId && m.Status == "Approved");
+            var isMember = await _context.ClubMembers
+                .AnyAsync(m => m.ClubId == clubId && m.UserId == CurrentUserId && m.Status == "Approved");
+
             if (!isLeader && !isMember && !User.IsInRole("Admin"))
-                return Forbid();
+                return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền xem danh sách thành viên"));
 
             var members = await _context.ClubMembers
                 .Where(m => m.ClubId == clubId && m.Status == "Approved")
@@ -317,15 +400,17 @@ namespace ClubManagementApi.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(ApiResponse<Object>.SuccessResponse(members));
+            return Ok(ApiResponse<object>.SuccessResponse(members));
         }
 
         [HttpGet("{clubId}/pending")]
         public async Task<IActionResult> GetPendingRequests(int clubId)
         {
             var club = await _context.Clubs.FirstOrDefaultAsync(c => c.ClubId == clubId);
-            if (club == null) return NotFound();
-            if (club.PresidentId != CurrentUserId) return Forbid();
+            if (club == null) return NotFound(ApiResponse<object>.FailResponse("CLB không tồn tại"));
+
+            if (club.PresidentId != CurrentUserId && !User.IsInRole("Admin"))
+                return StatusCode(403, ApiResponse<object>.FailResponse("Bạn không có quyền xem yêu cầu chờ duyệt"));
 
             var requests = await _context.ClubJoinRequests
                 .Where(r => r.ClubId == clubId && r.Status == "Pending")
@@ -346,7 +431,22 @@ namespace ClubManagementApi.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(ApiResponse<Object>.SuccessResponse(requests));
+            return Ok(ApiResponse<object>.SuccessResponse(requests));
+        }
+
+        private static void FireAndForget(Func<Task> taskFunc)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await taskFunc();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"FireAndForget error: {ex}");
+                }
+            });
         }
     }
 }
